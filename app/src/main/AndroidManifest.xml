@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.tumbasgo.customer">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.CALL_PHONE" />
+
+    <application
+        android:name="com.tumbasgo.customer.MyApplication"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        tools:replace="android:usesCleartextTraffic,android:allowBackup"
+
+
+        tools:ignore="GoogleAppIndexingWarning">
+        <activity android:name="com.tumbasgo.customer.activity.PaypalActivity" />
+        <activity android:name="com.tumbasgo.customer.activity.ChanegPasswordActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.BaseActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.AboutsActivity"
+            android:label="About"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.TramsAndConditionActivity"
+            android:label="Terms &amp; Conditions"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name="com.tumbasgo.customer.activity.PrivecyPolicyActivity"
+            android:label="Privacy &amp; Policy"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.ContectusActivity"
+            android:label="Contact us"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+
+        <activity
+            android:name="com.tumbasgo.customer.activity.CoupunActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.NotificationActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.ItemDetailsActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.SelectAreaActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.DayNight.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.InfoActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.ForgotActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.MyOrderListActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.ProfileActivity"
+            android:label="My Profile"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.AddressActivity"
+            android:label="My Address"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.FeedBackActivity"
+            android:label="FeedBack"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.RatesActivity"
+            android:label="Rate us"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.HomeActivity"
+            android:label="@string/title_activity_home"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateAlwaysHidden|adjustNothing"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.SingActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme2"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.LoginActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/AppTheme2"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.FirstActivity"
+            android:screenOrientation="portrait"
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            tools:ignore="LockedOrientationActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="com.tumbasgo.customer.activity.PopRatesActivity"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Dialog"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.RazerpayActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.MainActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.NotificationDetailsActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.VerifyPhoneActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+    </application>
+
+</manifest>

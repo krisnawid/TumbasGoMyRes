@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">TumbasGo</string>
+    <string name="password">Password</string>
+    <string name="login">Masuk</string>
+    <string name="sing">Daftar</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="navigation_drawer_open">Buka Navigasi</string>
+    <string name="navigation_drawer_close">Tutup Navigasi</string>
+    <string name="spinner_title">+62</string>
+
+    <string name="pic_myslf">Ambil Sendiri</string>
+    <!-- TODO: Remove or change this placeholder text -->
+
+    <!-- TODO: Remove or change this placeholder text -->
+
+</resources>

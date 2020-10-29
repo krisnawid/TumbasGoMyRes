@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "354464800003",
+    "firebase_url": "https://tumbasgo-4525d.firebaseio.com",
+    "project_id": "tumbasgo-4525d",
+    "storage_bucket": "tumbasgo-4525d.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:354464800003:android:7c4a91d09b509b08d9dd36",
+        "android_client_info": {
+          "package_name": "com.tumbasgo.customer"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "354464800003-blb8b45aann8208vi8hpotm4p5a5shce.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tumbasgo.customer",
+            "certificate_hash": "eb61c558d806923c8db86798fa69ac5f808e88d8"
+          }
+        },
+        {
+          "client_id": "354464800003-o5b2bfivamv5aodncttmvsq1fkus9ati.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-NbCRejdn9XVgJg6akr_crxVw2QoHXzw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "354464800003-o5b2bfivamv5aodncttmvsq1fkus9ati.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
