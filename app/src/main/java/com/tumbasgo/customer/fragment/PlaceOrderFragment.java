@@ -466,6 +466,8 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
             switch (result.getStatus()) {
                 case TransactionResult.STATUS_SUCCESS:
                     Toast.makeText(getContext(), "Transaction Finished. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    DatabaseHelper helper = new DatabaseHelper(getActivity());
+                    helper.deleteCard();
                     break;
                 case TransactionResult.STATUS_PENDING:
                     Toast.makeText(getContext(), "Transaction Pending. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
