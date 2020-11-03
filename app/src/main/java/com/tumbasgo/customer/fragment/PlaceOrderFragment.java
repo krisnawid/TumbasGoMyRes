@@ -1,5 +1,7 @@
 package com.tumbasgo.customer.fragment;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -29,9 +31,13 @@ import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 import com.tumbasgo.customer.BuildConfig;
 import com.tumbasgo.customer.R;
 import com.tumbasgo.customer.activity.HomeActivity;
+import com.tumbasgo.customer.database.DatabaseHelper;
+import com.tumbasgo.customer.database.MyCart;
+import com.tumbasgo.customer.model.Order;
 import com.tumbasgo.customer.model.Payment;
 import com.tumbasgo.customer.model.PaymentItem;
 import com.tumbasgo.customer.model.Times;
+import com.tumbasgo.customer.model.User;
 import com.tumbasgo.customer.retrofit.APIClient;
 import com.tumbasgo.customer.retrofit.GetResult;
 import com.tumbasgo.customer.utils.CustPrograssbar;
@@ -58,6 +64,11 @@ import retrofit2.Call;
 public class PlaceOrderFragment extends Fragment implements View.OnClickListener, GetResult.MyListener, TransactionFinishedCallback {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+
+    DatabaseHelper databaseHelper;
+    List<MyCart> myCarts;
+
+    User user;
 
     @BindView(R.id.radiogroup)
     RadioGroup rdgTime;
@@ -109,6 +120,40 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
         unbinder = ButterKnife.bind(this, view);
         custPrograssbar = new CustPrograssbar();
         sessionManager = new SessionManager(getActivity());
+
+//        databaseHelper = new DatabaseHelper(getActivity());
+//        myCarts = new ArrayList<>();
+//        Cursor res = databaseHelper.getAllData();
+//
+//        while (res.moveToNext()) {
+//            MyCart rModel = new MyCart();
+//            rModel.setId(res.getString(0));
+//            rModel.setPid(res.getString(1));
+//            rModel.setImage(res.getString(2));
+//            rModel.setTitle(res.getString(3));
+//            rModel.setWeight(res.getString(4));
+//            rModel.setCost(res.getString(5));
+//            rModel.setQty(res.getString(6));
+//            rModel.setDiscount(res.getInt(7));
+//            myCarts.add(rModel);
+//        }
+//
+//        System.out.println(myCarts.size());
+//
+//        for (int counter = 0; counter < myCarts.size(); counter++) {
+//            System.out.println("CARTTTTT" + myCarts.get(counter).getPid());
+//            System.out.println("CARTTTTT" + myCarts.get(counter).getTitle());
+//            System.out.println("CARTTTTT" + myCarts.get(counter).getCost());
+//            System.out.println("CARTTTTT" + myCarts.get(counter).getQty());
+//            System.out.println("--------");
+//
+//
+//        }
+//        user = sessionManager.getUserDetails("");
+//        System.out.println("Email : " + user.getEmail());
+//        System.out.println("First name : " + user.getName());
+//        System.out.println("Phone : " +user.getCcode() + user.getMobile());
+
         getTimeSlot();
         txtSelectdate.setText("" + getCurrentDate());
         HomeActivity.getInstance().setFrameMargin(0);
@@ -236,16 +281,72 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
         }
     }
 
+    private double amount(){
+        databaseHelper = new DatabaseHelper(getActivity());
+        myCarts = new ArrayList<>();
+        Cursor res = databaseHelper.getAllData();
+
+        while (res.moveToNext()) {
+            MyCart rModel = new MyCart();
+            rModel.setId(res.getString(0));
+            rModel.setPid(res.getString(1));
+            rModel.setImage(res.getString(2));
+            rModel.setTitle(res.getString(3));
+            rModel.setWeight(res.getString(4));
+            rModel.setCost(res.getString(5));
+            rModel.setQty(res.getString(6));
+            rModel.setDiscount(res.getInt(7));
+            myCarts.add(rModel);
+        }
+
+        double total = 0;
+        for (int counter = 0; counter < myCarts.size(); counter++) {
+            MyCart cart = myCarts.get(counter);
+            total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty())) / (100/cart.getDiscount());
+        }
+
+        return total;
+    }
 
     private TransactionRequest transactionRequest(){
-        TransactionRequest transactionRequest = new TransactionRequest(System.currentTimeMillis() + "", 20000);
+        TransactionRequest transactionRequest = new TransactionRequest( System.currentTimeMillis() + "", amount());
+        transactionRequest.setCustomerDetails(initCustomerDetails());
 
-        ItemDetails itemDetail1 = new ItemDetails("1", 20000, 20, "odading");
-        ItemDetails itemDetail2 = new ItemDetails("2", 50000, 30, "Kelapa");
+        databaseHelper = new DatabaseHelper(getActivity());
+        myCarts = new ArrayList<>();
+        Cursor res = databaseHelper.getAllData();
+
+        while (res.moveToNext()) {
+            MyCart rModel = new MyCart();
+            rModel.setId(res.getString(0));
+            rModel.setPid(res.getString(1));
+            rModel.setImage(res.getString(2));
+            rModel.setTitle(res.getString(3));
+            rModel.setWeight(res.getString(4));
+            rModel.setCost(res.getString(5));
+            rModel.setQty(res.getString(6));
+            rModel.setDiscount(res.getInt(7));
+            myCarts.add(rModel);
+        }
 
         ArrayList<ItemDetails> itemDetails = new ArrayList<>();
-        itemDetails.add(itemDetail1);
-        itemDetails.add(itemDetail2);
+        for (int counter = 0; counter < myCarts.size(); counter++) {
+            MyCart cart = myCarts.get(counter);
+            ItemDetails itemDetail = new ItemDetails(cart.getPid(), Integer.parseInt(cart.getCost()), Integer.parseInt(cart.getQty()), cart.getTitle());
+            itemDetails.add(itemDetail);
+        }
+
+//        ItemDetails itemDetail1 = new ItemDetails("1", 20000, 20, "odading");
+//        ItemDetails itemDetail2 = new ItemDetails("2", 50000, 30, "Kelapa");
+
+//        ArrayList<ItemDetails> itemDetails = new ArrayList<>();
+//        itemDetails.add(itemDetail1);
+//        itemDetails.add(itemDetail2);
+
+        for (int i = 0; i < itemDetails.size(); i++) {
+            System.out.println(itemDetails.get(i));
+            System.out.println("=======");
+        }
 
         CreditCard creditCard = new CreditCard();
 
@@ -262,10 +363,12 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
     private CustomerDetails initCustomerDetails() {
 
         //define customer detail (mandatory for coreflow)
+        user = sessionManager.getUserDetails("");
         CustomerDetails mCustomerDetails = new CustomerDetails();
-        mCustomerDetails.setPhone("085310102020");
-        mCustomerDetails.setFirstName("Haptiap tiap");
-        mCustomerDetails.setEmail("haptiap@gmail.com");
+
+        mCustomerDetails.setPhone(user.getCcode() + user.getMobile());
+        mCustomerDetails.setFirstName(user.getName());
+        mCustomerDetails.setEmail(user.getEmail());
         return mCustomerDetails;
     }
 
