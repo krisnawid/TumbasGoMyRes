@@ -1,7 +1,7 @@
 package com.tumbasgo.customer.fragment;
 
+import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -17,6 +17,9 @@ import android.widget.Toast;
 import androidx.fragment.app.Fragment;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
 import com.midtrans.sdk.corekit.core.MidtransSDK;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
@@ -30,10 +33,12 @@ import com.midtrans.sdk.corekit.models.snap.TransactionResult;
 import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
 import com.tumbasgo.customer.BuildConfig;
 import com.tumbasgo.customer.R;
+import com.tumbasgo.customer.activity.FailurePaymentActivity;
 import com.tumbasgo.customer.activity.HomeActivity;
+import com.tumbasgo.customer.activity.PendingPaymentActivity;
+import com.tumbasgo.customer.activity.SuccessPaymentActivity;
 import com.tumbasgo.customer.database.DatabaseHelper;
 import com.tumbasgo.customer.database.MyCart;
-import com.tumbasgo.customer.model.Order;
 import com.tumbasgo.customer.model.Payment;
 import com.tumbasgo.customer.model.PaymentItem;
 import com.tumbasgo.customer.model.Times;
@@ -42,9 +47,6 @@ import com.tumbasgo.customer.retrofit.APIClient;
 import com.tumbasgo.customer.retrofit.GetResult;
 import com.tumbasgo.customer.utils.CustPrograssbar;
 import com.tumbasgo.customer.utils.SessionManager;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 
 import org.json.JSONObject;
 
@@ -302,7 +304,11 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
         double total = 0;
         for (int counter = 0; counter < myCarts.size(); counter++) {
             MyCart cart = myCarts.get(counter);
-            total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty())) / (100/cart.getDiscount());
+            if (cart.getDiscount() > 0){
+                total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty())) / (100/cart.getDiscount());
+            }else{
+                total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty()));
+            }
         }
 
         return total;
@@ -466,14 +472,20 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
             switch (result.getStatus()) {
                 case TransactionResult.STATUS_SUCCESS:
                     Toast.makeText(getContext(), "Transaction Finished. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    Intent intentSuccessPayment = new Intent(getActivity(), SuccessPaymentActivity.class);
+                    startActivity(intentSuccessPayment);
                     DatabaseHelper helper = new DatabaseHelper(getActivity());
                     helper.deleteCard();
                     break;
                 case TransactionResult.STATUS_PENDING:
                     Toast.makeText(getContext(), "Transaction Pending. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    Intent intentPendingPayment = new Intent(getActivity(), PendingPaymentActivity.class);
+                    startActivity(intentPendingPayment);
                     break;
                 case TransactionResult.STATUS_FAILED:
                     Toast.makeText(getContext(), "Transaction Failed. ID: " + result.getResponse().getTransactionId() + ". Message: " + result.getResponse().getStatusMessage(), Toast.LENGTH_LONG).show();
+                    Intent intentFailurePayment = new Intent(getActivity(), FailurePaymentActivity.class);
+                    startActivity(intentFailurePayment);
                     break;
             }
             result.getResponse().getValidationMessages();

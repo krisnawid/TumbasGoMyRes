@@ -150,6 +150,18 @@
             android:name="com.tumbasgo.customer.activity.VerifyPhoneActivity"
             android:screenOrientation="portrait"
             tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.SuccessPaymentActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.PendingPaymentActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
+        <activity
+            android:name="com.tumbasgo.customer.activity.FailurePaymentActivity"
+            android:screenOrientation="portrait"
+            tools:ignore="LockedOrientationActivity" />
     </application>
 
 </manifest>
