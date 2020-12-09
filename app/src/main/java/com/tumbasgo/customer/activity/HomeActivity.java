@@ -26,6 +26,7 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.android.material.appbar.AppBarLayout;
 import com.tumbasgo.customer.R;
 import com.tumbasgo.customer.database.DatabaseHelper;
 import com.tumbasgo.customer.fragment.AddressFragment;
@@ -37,7 +38,6 @@ import com.tumbasgo.customer.fragment.OrderSumrryFragment;
 import com.tumbasgo.customer.model.User;
 import com.tumbasgo.customer.utils.CustPrograssbar;
 import com.tumbasgo.customer.utils.SessionManager;
-import com.google.android.material.appbar.AppBarLayout;
 import com.tumbasgo.customer.utils.Utiles;
 
 import butterknife.BindView;
@@ -247,6 +247,8 @@ public class HomeActivity extends AppCompatActivity {
             if (fragment instanceof HomeFragment && fragment.isVisible()) {
                 finish();
             } else if (fragment instanceof OrderSumrryFragment && fragment.isVisible() && OrderSumrryFragment.isorder) {
+//                getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+//                getSupportActionBar().hide();
                 OrderSumrryFragment.isorder = false;
                 Intent i = new Intent(this, HomeActivity.class);
                 startActivity(i);
@@ -260,6 +262,8 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             if (fragment instanceof OrderSumrryFragment && fragment.isVisible()) {
+//                getWindow().requestFeature(Window.FEATURE_ACTION_BAR);
+//                getSupportActionBar().hide();
                 edSearch.setText("");
                 lvlActionsearch.setVisibility(View.GONE);
             } else if (fragment instanceof AddressFragment && fragment.isVisible()) {

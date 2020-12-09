@@ -103,9 +103,9 @@ public class MyOrderListActivity extends BaseActivity implements GetResult.MyLis
         setContentView(R.layout.activity_order_details);
         requestPermissions(new String[]{Manifest.permission.CALL_PHONE}, 1);
         ButterKnife.bind(this);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setTitle("Daftar Pesanan ");
-        getSupportActionBar().setElevation(0);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setTitle("Daftar Pesanan ");
+//        getSupportActionBar().setElevation(0);
         custPrograssbar=new CustPrograssbar();
         sessionManager = new SessionManager(MyOrderListActivity.this);
         user = sessionManager.getUserDetails("");

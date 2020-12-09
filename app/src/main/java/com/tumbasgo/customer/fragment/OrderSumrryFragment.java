@@ -21,12 +21,30 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.recyclerview.widget.StaggeredGridLayoutManager;
 
 import com.bumptech.glide.Glide;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
+import com.midtrans.sdk.corekit.core.MidtransSDK;
+import com.midtrans.sdk.corekit.core.TransactionRequest;
+import com.midtrans.sdk.corekit.core.themes.CustomColorTheme;
+import com.midtrans.sdk.corekit.models.BankType;
+import com.midtrans.sdk.corekit.models.CustomerDetails;
+import com.midtrans.sdk.corekit.models.ItemDetails;
+import com.midtrans.sdk.corekit.models.snap.Authentication;
+import com.midtrans.sdk.corekit.models.snap.CreditCard;
+import com.midtrans.sdk.corekit.models.snap.TransactionResult;
+import com.midtrans.sdk.uikit.SdkUIFlowBuilder;
+import com.tumbasgo.customer.BuildConfig;
 import com.tumbasgo.customer.R;
 import com.tumbasgo.customer.activity.AddressActivity;
 import com.tumbasgo.customer.activity.CoupunActivity;
+import com.tumbasgo.customer.activity.FailurePaymentActivity;
 import com.tumbasgo.customer.activity.HomeActivity;
 import com.tumbasgo.customer.activity.PaypalActivity;
+import com.tumbasgo.customer.activity.PendingPaymentActivity;
 import com.tumbasgo.customer.activity.RazerpayActivity;
+import com.tumbasgo.customer.activity.SuccessPaymentActivity;
 import com.tumbasgo.customer.database.DatabaseHelper;
 import com.tumbasgo.customer.database.MyCart;
 import com.tumbasgo.customer.model.Address;
@@ -38,9 +56,6 @@ import com.tumbasgo.customer.retrofit.APIClient;
 import com.tumbasgo.customer.retrofit.GetResult;
 import com.tumbasgo.customer.utils.CustPrograssbar;
 import com.tumbasgo.customer.utils.SessionManager;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.tumbasgo.customer.utils.Utiles;
 
 import org.json.JSONArray;
@@ -58,7 +73,7 @@ import butterknife.Unbinder;
 import retrofit2.Call;
 
 
-public class OrderSumrryFragment extends Fragment implements GetResult.MyListener {
+public class OrderSumrryFragment extends Fragment implements GetResult.MyListener, TransactionFinishedCallback {
 
     @BindView(R.id.my_recycler_view)
     RecyclerView myRecyclerview;
@@ -101,12 +116,24 @@ public class OrderSumrryFragment extends Fragment implements GetResult.MyListene
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initMidtransSDK();
         if (getArguments() != null) {
             time = getArguments().getString("TIME");
             data = getArguments().getString("DATE");
             payment = getArguments().getString("PAYMENT");
             paymentItem = (PaymentItem) getArguments().getSerializable("PAYMENTDETAILS");
         }
+    }
+
+    private void initMidtransSDK() {
+        SdkUIFlowBuilder.init()
+                .setContext(getActivity())
+                .setMerchantBaseUrl(BuildConfig.BASE_URL)
+                .setClientKey(BuildConfig.CLIENT_KEY)
+                .setTransactionFinishedCallback(this)
+                .enableLog(true)
+                .setColorTheme(new CustomColorTheme("#FFE51255", "#B61548", "#FFE51255"))
+                .buildSDK();
     }
 
     DatabaseHelper databaseHelper;
@@ -195,6 +222,43 @@ public class OrderSumrryFragment extends Fragment implements GetResult.MyListene
         txtDiscount.setText(sessionManager.getStringData(SessionManager.CURRUNCY) + " " + sessionManager.getIntData(SessionManager.COUPON));
 
         total = totalAmount[0];
+    }
+
+    @Override
+    public void onTransactionFinished(TransactionResult result) {
+        if (result.getResponse() != null) {
+            switch (result.getStatus()) {
+                case TransactionResult.STATUS_SUCCESS:
+                    sendorderServer();
+                    Toast.makeText(getContext(), "Transaction Finished. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    Intent intentSuccessPayment = new Intent(getActivity(), SuccessPaymentActivity.class);
+                    startActivity(intentSuccessPayment);
+                    DatabaseHelper helper = new DatabaseHelper(getActivity());
+                    helper.deleteCard();
+                    break;
+                case TransactionResult.STATUS_PENDING:
+                    sendorderServer();
+                    Toast.makeText(getContext(), "Transaction Pending. ID: " + result.getResponse().getTransactionId(), Toast.LENGTH_LONG).show();
+                    Intent intentPendingPayment = new Intent(getActivity(), PendingPaymentActivity.class);
+                    startActivity(intentPendingPayment);
+                    break;
+                case TransactionResult.STATUS_FAILED:
+                    sendorderServer();
+                    Toast.makeText(getContext(), "Transaction Failed. ID: " + result.getResponse().getTransactionId() + ". Message: " + result.getResponse().getStatusMessage(), Toast.LENGTH_LONG).show();
+                    Intent intentFailurePayment = new Intent(getActivity(), FailurePaymentActivity.class);
+                    startActivity(intentFailurePayment);
+                    break;
+            }
+            result.getResponse().getValidationMessages();
+        } else if (result.isTransactionCanceled()) {
+            Toast.makeText(getContext(), "Transaction Canceled", Toast.LENGTH_LONG).show();
+        } else {
+            if (result.getStatus().equalsIgnoreCase(TransactionResult.STATUS_INVALID)) {
+                Toast.makeText(getContext(), "Transaction Invalid", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "Transaction Finished with failure.", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
 
@@ -389,12 +453,110 @@ public class OrderSumrryFragment extends Fragment implements GetResult.MyListene
 
                 } else if (payment.equalsIgnoreCase("Cash On Delivery") || payment.equalsIgnoreCase("Pickup Myself")) {
                     sendorderServer();
+                } else if (payment.equalsIgnoreCase("E-wallet")){
+                    MidtransSDK.getInstance().setTransactionRequest(transactionRequest());
+                    MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
                 }
 
                 break;
             default:
                 break;
         }
+    }
+
+    private double amount(){
+        databaseHelper = new DatabaseHelper(getActivity());
+        myCarts = new ArrayList<>();
+        Cursor res = databaseHelper.getAllData();
+
+        while (res.moveToNext()) {
+            MyCart rModel = new MyCart();
+            rModel.setId(res.getString(0));
+            rModel.setPid(res.getString(1));
+            rModel.setImage(res.getString(2));
+            rModel.setTitle(res.getString(3));
+            rModel.setWeight(res.getString(4));
+            rModel.setCost(res.getString(5));
+            rModel.setQty(res.getString(6));
+            rModel.setDiscount(res.getInt(7));
+            myCarts.add(rModel);
+        }
+
+        double total = 0;
+        for (int counter = 0; counter < myCarts.size(); counter++) {
+            MyCart cart = myCarts.get(counter);
+            if (cart.getDiscount() > 0){
+                total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty())) / (100/cart.getDiscount());
+            }else{
+                total += (Double.parseDouble(cart.getCost()) * Double.parseDouble(cart.getQty()));
+            }
+        }
+
+        return total;
+    }
+
+    private CustomerDetails initCustomerDetails() {
+
+        //define customer detail (mandatory for coreflow)
+        user = sessionManager.getUserDetails("");
+        CustomerDetails mCustomerDetails = new CustomerDetails();
+
+        mCustomerDetails.setPhone(user.getCcode() + user.getMobile());
+        mCustomerDetails.setFirstName(user.getName());
+        mCustomerDetails.setEmail(user.getEmail());
+        return mCustomerDetails;
+    }
+
+    private TransactionRequest transactionRequest(){
+        TransactionRequest transactionRequest = new TransactionRequest( System.currentTimeMillis() + "", amount());
+        transactionRequest.setCustomerDetails(initCustomerDetails());
+
+        databaseHelper = new DatabaseHelper(getActivity());
+        myCarts = new ArrayList<>();
+        Cursor res = databaseHelper.getAllData();
+
+        while (res.moveToNext()) {
+            MyCart rModel = new MyCart();
+            rModel.setId(res.getString(0));
+            rModel.setPid(res.getString(1));
+            rModel.setImage(res.getString(2));
+            rModel.setTitle(res.getString(3));
+            rModel.setWeight(res.getString(4));
+            rModel.setCost(res.getString(5));
+            rModel.setQty(res.getString(6));
+            rModel.setDiscount(res.getInt(7));
+            myCarts.add(rModel);
+        }
+
+        ArrayList<ItemDetails> itemDetails = new ArrayList<>();
+        for (int counter = 0; counter < myCarts.size(); counter++) {
+            MyCart cart = myCarts.get(counter);
+            ItemDetails itemDetail = new ItemDetails(cart.getPid(), Integer.parseInt(cart.getCost()), Integer.parseInt(cart.getQty()), cart.getTitle());
+            itemDetails.add(itemDetail);
+        }
+
+//        ItemDetails itemDetail1 = new ItemDetails("1", 20000, 20, "odading");
+//        ItemDetails itemDetail2 = new ItemDetails("2", 50000, 30, "Kelapa");
+
+//        ArrayList<ItemDetails> itemDetails = new ArrayList<>();
+//        itemDetails.add(itemDetail1);
+//        itemDetails.add(itemDetail2);
+
+        for (int i = 0; i < itemDetails.size(); i++) {
+            System.out.println(itemDetails.get(i));
+            System.out.println("=======");
+        }
+
+        CreditCard creditCard = new CreditCard();
+
+        creditCard.setSaveCard(false);
+
+        creditCard.setAuthentication(Authentication.AUTH_RBA);
+        creditCard.setBank(BankType.BCA); //set spesific acquiring bank
+
+        transactionRequest.setCreditCard(creditCard);
+
+        return transactionRequest;
     }
 
     public void clearFragment() {

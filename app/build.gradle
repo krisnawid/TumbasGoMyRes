@@ -27,7 +27,7 @@ android {
     productFlavors {
         sandbox {
             applicationId = "com.tumbasgo.customer"
-            buildConfigField "String", "BASE_URL", "\"http://10.0.2.2:80/admin-aplikasi/api/midtrans.php/\""
+            buildConfigField "String", "BASE_URL", "\"http://192.168.137.1:80/admin-aplikasi/api/server-test.php/\""
             buildConfigField "String", "CLIENT_KEY", "\"SB-Mid-client-Q2WKmlZWmoYxVJgZ\""
         }
     }

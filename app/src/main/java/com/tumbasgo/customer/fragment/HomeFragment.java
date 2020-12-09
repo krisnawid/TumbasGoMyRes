@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -19,6 +20,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.viewpager.widget.PagerAdapter;
 
 import com.bumptech.glide.Glide;
+import com.google.android.material.tabs.TabLayout;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 import com.tumbasgo.customer.R;
 import com.tumbasgo.customer.activity.HomeActivity;
 import com.tumbasgo.customer.activity.ItemDetailsActivity;
@@ -35,10 +40,6 @@ import com.tumbasgo.customer.retrofit.APIClient;
 import com.tumbasgo.customer.retrofit.GetResult;
 import com.tumbasgo.customer.utils.AutoScrollViewPager;
 import com.tumbasgo.customer.utils.SessionManager;
-import com.google.android.material.tabs.TabLayout;
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.tumbasgo.customer.utils.Utiles;
 
 import org.json.JSONException;
@@ -95,6 +96,8 @@ public class HomeFragment extends Fragment implements CategoryAdp.RecyclerTouchL
         bannerDatumList = new ArrayList<>();
         sessionManager = new SessionManager(mContext);
         homeListFragment = this;
+        ((AppCompatActivity)getActivity()).getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
         recyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 4));
         LinearLayoutManager mLayoutManager1 = new LinearLayoutManager(mContext);
         mLayoutManager1.setOrientation(LinearLayoutManager.HORIZONTAL);

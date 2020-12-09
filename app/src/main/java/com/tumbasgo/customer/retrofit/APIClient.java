@@ -8,7 +8,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
     static Retrofit retrofit = null;
-    public static String baseUrl = "http://10.0.2.2:80/admin-aplikasi/";
+    public static String baseUrl = "http://192.168.137.1:80/admin-aplikasi/";
 //    public static String baseUrl = "https://tumbasgo.com/admin-aplikasi/";
     public static final String APPEND_URL = "api/";
 

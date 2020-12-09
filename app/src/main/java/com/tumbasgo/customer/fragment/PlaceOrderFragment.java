@@ -21,7 +21,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.midtrans.sdk.corekit.callback.TransactionFinishedCallback;
-import com.midtrans.sdk.corekit.core.MidtransSDK;
 import com.midtrans.sdk.corekit.core.TransactionRequest;
 import com.midtrans.sdk.corekit.core.themes.CustomColorTheme;
 import com.midtrans.sdk.corekit.models.BankType;
@@ -271,8 +270,17 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
                 view.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        MidtransSDK.getInstance().setTransactionRequest(transactionRequest());
-                        MidtransSDK.getInstance().startPaymentUiFlow(getActivity());
+                        int selectedId = rdgTime.getCheckedRadioButtonId();
+                        RadioButton selectTime = rdgTime.findViewById(selectedId);
+                        sessionManager.setIntData(SessionManager.COUPON, 0);
+                        OrderSumrryFragment fragment = new OrderSumrryFragment();
+                        Bundle bundle = new Bundle();
+                        bundle.putString("DATE", txtSelectdate.getText().toString());
+                        bundle.putString("TIME", selectTime.getText().toString());
+                        bundle.putString("PAYMENT", paymentItem.getTitle());
+                        bundle.putSerializable("PAYMENTDETAILS", paymentItem);
+                        fragment.setArguments(bundle);
+                        HomeActivity.getInstance().callFragment(fragment);
                     }
                 });
             }
@@ -499,4 +507,6 @@ public class PlaceOrderFragment extends Fragment implements View.OnClickListener
             }
         }
     }
+
+
 }
